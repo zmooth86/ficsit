@@ -13,7 +13,7 @@ function Download(url)
 end
 
 function LoadScript(repo, branch, dir, script)
-    local script = Download('https://raw.githubusercontent.com/' .. repo .. '/' .. branch .. '/' .. dir .. '/' .. script)
+    local data = Download('https://raw.githubusercontent.com/' .. repo .. '/' .. branch .. '/' .. dir .. '/' .. script)
     local path = '/' .. script
 
     filesystem.initFileSystem('/dev')
@@ -22,7 +22,7 @@ function LoadScript(repo, branch, dir, script)
 
     local file = filesystem.open(path, 'w')
 
-    file:write(script)
+    file:write(data)
     file:close()
 
     return path
