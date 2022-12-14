@@ -1,9 +1,9 @@
 RefreshInterval = 1
 
 Colors = {
-    ok = { r = 0, g = 17, b = 0, a = 0.01 },
-    warning = { r = 17, g = 17, b = 0, a = 0.01 },
-    error = { r = 17, g = 0, b = 0, a = 0.01 }
+    ok = { r = 0, g = 7, b = 0, a = 0.01 },
+    warning = { r = 7, g = 7, b = 0, a = 0.01 },
+    error = { r = 7, g = 0, b = 0, a = 0.01 }
 }
 
 WarehouseItems = {
