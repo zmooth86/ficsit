@@ -45,13 +45,9 @@ WarehouseItems = {
     TurboMotor = { item = findItem('Turbo Motor'), icon = 273 }
 }
 
-function GetSign(name)
-    return component.proxy(component.findComponent(name)[1])
-end
-
-function GetSigns(group)
+function GetSigns(class)
     signs = {}
-    for _, comp in ipairs(component.findComponent(group)) do
+    for _, comp in ipairs(component.findComponent(findClass(class))) do
         table.insert(signs, component.proxy(comp))
     end
     return signs
@@ -77,7 +73,7 @@ function SetSignColor(sign, color)
 end
 
 function GetColor(level)
-    if level < 0.01 then
+    if level < 0.1 then
         return Colors.error
     elseif level < 0.5 then
         return Colors.warning
@@ -86,30 +82,36 @@ function GetColor(level)
     return Colors.ok
 end
 
-function ContainerLevel(container, warehouseItem)
-    local level = 0
+function GetContainerLevel(container, item)
+    local inventory = container:getInventories()[1]
+    local max = inventory.size * item.max
+    local count = 0
 
-    if warehouseItem then
-        local inventory = container:getInventories()[1]
-        local max = inventory.size * warehouseItem['item'].max
-        local count = 0
-
-        for i = 0, inventory.size - 1, 1 do
-            local stack = inventory:getStack(i)
-            count = count + stack.count
-        end
-
-        level = count / max
+    for i = 0, inventory.size - 1, 1 do
+        local stack = inventory:getStack(i)
+        count = count + stack.count
     end
 
-    return level
+    return count / max
+end
+
+function SumContainerLevel(container, warehouseItem)
+    local level = 0
+
+    if warehouseItem.item then
+        for _, c in pairs(container) do
+            level = level + GetContainerLevel(c, warehouseItem.item)
+        end
+    end
+
+    return level / #container
 end
 
 function UpdateLevelDisplay(container, warehouseItem)
     local displayComps = component.findComponent("LevelDisplays")
-    local color = GetColor(ContainerLevel(container, warehouseItem))
+    local color = GetColor(SumContainerLevel(container, warehouseItem))
 
-    for _, display in ipairs(GetSigns('LevelDisplays')) do
+    for _, display in ipairs(GetSigns('Build_StandaloneWidgetSign_Square_Small_C')) do
         SetSignColor(display, color)
     end
 end
@@ -118,7 +120,7 @@ function AssignItem(container, warehouseItem)
     if warehouseItem then
         local signComps = component.findComponent("Signs")
 
-        for _, sign in ipairs(GetSigns('Signs')) do
+        for _, sign in ipairs(GetSigns('Build_StandaloneWidgetSign_Square_C')) do
             SetSignIcon(sign, warehouseItem['icon'])
         end
     else
@@ -130,11 +132,11 @@ function GetItem(container)
     local item = WarehouseItems.None
 
     for _, c in pairs(container) do
-        local inventory = container:getInventories()[1]
+        local inventory = c:getInventories()[1]
         local stack = inventory:getStack(0)
 
         if stack.count > 0 then
-            local itemId = string.gsub(stack.item.name, '( |-)', '')
+            local itemId = string.gsub(stack.item.type.name, '( |-)', '')
             return WarehouseItems[itemId]
         end
     end
@@ -154,7 +156,7 @@ end
 
 while true do
     local container = GetContainer()
-    local warehouseItem = GetItem(container)
+    local warehouseItem = #container and GetItem(container) or WarehouseItems.None
 
     AssignItem(container, warehouseItem)
     UpdateLevelDisplay(container, warehouseItem)
