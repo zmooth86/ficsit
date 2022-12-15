@@ -1,5 +1,8 @@
 RefreshInterval = 1
 
+Network = component.proxy(component.findComponent(findClass("NetworkCard")[1]))
+WarehousePort = 42
+
 Colors = {
     ok = { r = 0, g = 7, b = 0, a = 0.01 },
     warning = { r = 7, g = 7, b = 0, a = 0.01 },
@@ -72,6 +75,10 @@ function SetSignColor(sign, color)
     event.pull(0.01)
 end
 
+function BroadcastItemLevel(item, level)
+    Network.broadcast(WarehousePort, item, level)
+end
+
 function GetColor(level)
     if level < 0.1 then
         return Colors.error
@@ -95,7 +102,7 @@ function GetContainerLevel(container, item)
     return count / max
 end
 
-function SumContainerLevel(container, warehouseItem)
+function GetItemLevel(warehouseItem, container)
     local level = 0
 
     if warehouseItem.item then
@@ -107,19 +114,19 @@ function SumContainerLevel(container, warehouseItem)
     return level / #container
 end
 
-function UpdateLevelDisplay(container, warehouseItem)
-    local displayComps = component.findComponent("LevelDisplays")
-    local color = GetColor(SumContainerLevel(container, warehouseItem))
+function UpdateItemLevel(warehouseItem, container)
+    local level = GetItemLevel(warehouseItem, container)
+    local color = GetColor(level)
 
     for _, display in ipairs(GetSigns('Build_StandaloneWidgetSign_Square_Small_C')) do
         SetSignColor(display, color)
     end
+
+    BroadcastItemLevel(warehouseItem.item.name, level)
 end
 
-function AssignItem(container, warehouseItem)
+function AssignItem(warehouseItem, container)
     if warehouseItem then
-        local signComps = component.findComponent("Signs")
-
         for _, sign in ipairs(GetSigns('Build_StandaloneWidgetSign_Square_C')) do
             SetSignIcon(sign, warehouseItem['icon'])
         end
@@ -158,8 +165,8 @@ while true do
     local container = GetContainer()
     local warehouseItem = #container and GetItem(container) or WarehouseItems.None
 
-    AssignItem(container, warehouseItem)
-    UpdateLevelDisplay(container, warehouseItem)
+    AssignItem(warehouseItem, container)
+    UpdateItemLevel(warehouseItem, container)
 
     event.pull(RefreshInterval)
 end
