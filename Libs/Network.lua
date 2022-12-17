@@ -20,14 +20,17 @@ Networks = {
     }
 }
 
-function Networks.findNetwork(id)
+function Network:init()
     for _, net in ipairs(Networks) do
-        if net.id == id then
+        if net.id == self.device.nick then
             return net
         end
     end
 
-    computer.panic('Cannot find network ' .. id .. '!')
+    computer.panic('Cannot find network ' .. self.device.nick .. '!')
+
+    event.listen(self.device)
+    self:openPorts()
 end
 
 function Network:isNetwork(port)
@@ -74,11 +77,8 @@ function Network:openPorts()
     end
 end
 
-Network = Networks.findNetwork(computer.nick)
 Network.device = component.proxy(component.findComponent(findClass("NetworkCard")[1]))
 if not Network.device then
     computer.panic('No network card found!')
 end
-
-event.listen(Network.device)
-Network:openPorts()
+Network = Network:init()
