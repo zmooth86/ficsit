@@ -38,7 +38,7 @@ function Control()
 
     if update then
         local status = 'Going to restart for update.'
-        Network:status(computer, status)
+        Network:status(status)
         print(status)
 
         Repo = repo
@@ -85,7 +85,7 @@ Scheduler:create(Control)
 Scheduler:create(Main)
 
 local status = 'System up and running.'
-Network:status(computer, status)
+Network:status(status)
 print(status)
 
 Scheduler:run()
