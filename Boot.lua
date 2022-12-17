@@ -2,6 +2,7 @@ RefreshInterval = 5
 
 Repo = 'zmooth86/ficsit'
 Branch = 'main'
+Script = 'HUB/Warehouse/Dispenser.lua'
 
 INET = computer.getPCIDevices(findClass('FINInternetCard'))[1]
 
@@ -15,8 +16,6 @@ function DownloadScript(sourcePath)
 end
 
 function SaveScript(script, path)
-    local path = '/' .. path
-
     filesystem.initFileSystem('/dev')
     filesystem.makeFileSystem('tmpfs', 'scripts')
     filesystem.mount('/dev/scripts', '/')
@@ -25,11 +24,6 @@ function SaveScript(script, path)
 
     file:write(script)
     file:close()
-end
-
-function UpdateMain(script)
-    print('Updating main script ' .. script .. ' from ' .. Repo .. '/' .. Branch .. '...')
-    SaveScript(DownloadScript(script), 'Main.lua')
 end
 
 function UpdateBoot()
@@ -52,8 +46,8 @@ function Control()
 
             Repo = repo
             Branch = branch
+            Script = script
 
-            UpdateMain(script)
             UpdateBoot()
 
             print('Resetting the system...')
@@ -69,21 +63,28 @@ function Main()
     filesystem.doFile('Main.lua')
 end
 
+function LoadMain()
+    print('Loading main script ' .. Script .. ' from ' .. Repo .. '/' .. Branch .. '...')
+    SaveScript(DownloadScript(Script), 'Main.lua')
+end
+
 function LoadLib(lib)
     print('Loading lib ' .. lib .. ' from ' .. Repo .. '/' .. Branch .. '...')
-    SaveScript(DownloadScript(lib), lib)
+    SaveScript(DownloadScript('Libs/' .. lib), lib)
+
     filesystem.doFile(lib)
 end
 
 function LoadLIbs()
-    LoadLib('Libs/Scheduler.lua')
-    LoadLib('Libs/Network.lua')
+    LoadLib('Scheduler.lua')
+    LoadLib('Network.lua')
 end
 
 
 
 
 LoadLIbs()
+LoadMain()
 
 Scheduler.create(Control)
 Scheduler.create(Main)
