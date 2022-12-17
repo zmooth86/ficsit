@@ -1,5 +1,3 @@
-RefreshInterval = 1
-
 Colors = {
     ok = { r = 0, g = 7, b = 0, a = 0.01 },
     warning = { r = 7, g = 7, b = 0, a = 0.01 },
@@ -44,38 +42,6 @@ WarehouseItems = {
     Supercomputer = { item = findItem('Supercomputer'), icon = 267 },
     TurboMotor = { item = findItem('Turbo Motor'), icon = 273 }
 }
-
-function DownloadScript(sourcePath)
-    local url = 'https://raw.githubusercontent.com/' .. Repo .. '/' .. Branch .. '/' .. sourcePath
-    local req = INET:request(url, 'GET', '')
-    local _, data = req:await()
-
-    return data
-end
-
-function SaveScript(script, path)
-    local path = '/' .. path
-
-    filesystem.initFileSystem('/dev')
-    filesystem.makeFileSystem('tmpfs', 'scripts')
-    filesystem.mount('/dev/scripts', '/')
-
-    local file = filesystem.open(path, 'w')
-
-    file:write(script)
-    file:close()
-end
-
-function LoadLib(lib)
-    print('Loading lib ' .. lib .. ' from ' .. Repo .. '/' .. Branch .. '...')
-    SaveScript(DownloadScript(lib), lib)
-    filesystem.doFile(lib)
-end
-
-function LoadLIbs()
-    LoadLib('Libs/Network.lua')
-    LoadLib('Libs/Signs.lua')
-end
 
 function GetColor(level)
     if level < 0.1 then
@@ -162,13 +128,8 @@ end
 
 
 
-LoadLIbs()
-while true do
-    local container = GetContainer()
-    local warehouseItem = #container and GetItem(container) or WarehouseItems.None
+local container = GetContainer()
+local warehouseItem = #container and GetItem(container) or WarehouseItems.None
 
-    AssignItem(warehouseItem, container)
-    UpdateItemLevel(warehouseItem, container)
-
-    event.pull(RefreshInterval)
-end
+AssignItem(warehouseItem, container)
+UpdateItemLevel(warehouseItem, container)

@@ -1,4 +1,3 @@
-RefreshInterval = 1
 IndicatorModules = 30
 
 Colors = {
@@ -46,8 +45,7 @@ function IndicateWorkload(pole)
     end
 end
 
-while true do
-    IndicateWorkload(component.proxy(component.findComponent(findClass('FGBuildablePowerPole'))[1]))
 
-    event.pull(RefreshInterval)
-end
+
+
+IndicateWorkload(component.proxy(component.findComponent(findClass('FGBuildablePowerPole'))[1]))

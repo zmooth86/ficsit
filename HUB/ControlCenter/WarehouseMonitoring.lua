@@ -34,12 +34,10 @@ end
 
 
 
-while true do
-    local item, level = Network:receive()
+local item, level = Network:receive()
 
-    if item then
-        print(item, level)
-    end
-
-    event.pull(RefreshInterval)
+if item then
+    print(item, level)
 end
+
+event.pull(RefreshInterval)

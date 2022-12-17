@@ -1,6 +1,4 @@
-RefreshInterval = 1
-
-function Printfuel()
+function UpdateDisplay()
     local fuelStation = component.proxy(component.findComponent("FuelStation")[1])
     local fuelDisplay = component.proxy(component.findComponent("FuelDisplay")[1])
 
@@ -28,9 +26,7 @@ function RequestFuel()
 end
 
 
-while true do
-    Printfuel()
-    RequestFuel()
 
-    event.pull(RefreshInterval)
-end
+
+UpdateDisplay()
+RequestFuel()

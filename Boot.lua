@@ -1,5 +1,3 @@
-RefreshInterval = 5
-
 Repo = 'zmooth86/ficsit'
 Branch = 'main'
 Script = 'HUB/Warehouse/Dispenser.lua'
@@ -36,29 +34,21 @@ function UpdateBoot()
 end
 
 function Control()
-    local status = 'System up and running.'
-    Network:status(computer, status)
-    print(status)
+    local update, repo, branch, script = Network:receiveCommand(Network.Commands.Update)
 
-    while true do
-        local update, repo, branch, script = Network:receiveCommand(Network.Commands.Update)
+    if update then
+        local status = 'Going to restart for update.'
+        Network:status(computer, status)
+        print(status)
 
-        if update then
-            local status = 'Going to restart for update.'
-            Network:status(computer, status)
-            print(status)
+        Repo = repo
+        Branch = branch
+        Script = script
 
-            Repo = repo
-            Branch = branch
-            Script = script
+        UpdateBoot()
 
-            UpdateBoot()
-
-            print('Resetting the system...')
-            computer.reset()
-        end
-
-        event.pull(RefreshInterval)
+        print('Resetting the system...')
+        computer.reset()
     end
 end
 
@@ -82,6 +72,7 @@ end
 function LoadLIbs()
     LoadLib('Scheduler.lua')
     LoadLib('Network.lua')
+    LoadLib('Signs.lua')
 end
 
 
@@ -90,7 +81,11 @@ end
 LoadLIbs()
 LoadMain()
 
-Scheduler.create(Control)
-Scheduler.create(Main)
+Scheduler:create(Control)
+Scheduler:create(Main)
 
-Scheduler.run()
+local status = 'System up and running.'
+Network:status(computer, status)
+print(status)
+
+Scheduler:run()

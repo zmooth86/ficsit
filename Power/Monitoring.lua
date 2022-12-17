@@ -1,5 +1,4 @@
 Width, Height = 110,20
-RefreshInterval = 1
 
 BGColors = {
     default = { r = 0, g = 0, b = 0, a = 0.0 },
@@ -192,17 +191,16 @@ function DrawStats(row, pole)
 end
 
 
-while true do
-    local row = 0
 
-    ClearScreen()
 
-    row = DrawStats(row, component.proxy(component.findComponent("Backup")[1]))
-    row = row + 1
-    row = DrawStats(row, component.proxy(component.findComponent("Generators")[1]))
-    row = row + 1
-    row = DrawStats(row, component.proxy(component.findComponent("Grid")[1]))
+local row = 0
 
-    GPU:flush()
-    event.pull(RefreshInterval)
-end
+ClearScreen()
+
+row = DrawStats(row, component.proxy(component.findComponent("Backup")[1]))
+row = row + 1
+row = DrawStats(row, component.proxy(component.findComponent("Generators")[1]))
+row = row + 1
+row = DrawStats(row, component.proxy(component.findComponent("Grid")[1]))
+
+GPU:flush()
