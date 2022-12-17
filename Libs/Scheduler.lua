@@ -27,13 +27,13 @@ function Scheduler.run()
             return
         end
         local t = Scheduler.threads[Scheduler.current]
-        if coroutine.status(t.coroutine) == 'running' then
+        if t and coroutine.status(t.coroutine) == 'running' then
             coroutine.yield(t.coroutine)
         end
         if Scheduler.current > #Scheduler.threads then
             Scheduler.current = 1
         end
-        t = Scheduler.threads[Scheduler.current].coroutine
+        t = Scheduler.threads[Scheduler.current]
         coroutine.resume(t.coroutine)
         Scheduler.current = Scheduler.current + 1
     end
