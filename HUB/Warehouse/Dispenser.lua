@@ -1,37 +1,5 @@
 RefreshInterval = 1
 
-Networks = {
-    ALL = {
-        port = 1
-    },
-    HUB = {
-        id = 'HUB',
-        port = 2,
-        ControlCenter = { id = 'ControlCenter', group = Networks.HUB, port = 21 },
-        ProjectAssembly = { id = 'ProjectAssembly', group = Networks.HUB, port = 22 },
-        Warehouse = { id = 'Warehouse', group = Networks.HUB, port = 23 }
-    },
-    Highway = {
-        id = 'Highway',
-        port = 3
-    },
-    Power = {
-        id = 'Power',
-        port = 4,
-        CoalPlant = { id = 'CoalPlant', group = Networks.Power, port = 41 }
-    }
-}
-
-function Networks.FindNetwork(id)
-    for _, net in ipairs(Networks) do
-        if net.id == id then
-            return net
-        end
-    end
-
-    computer.panic('Cannot find network ' .. id)
-end
-
 Colors = {
     ok = { r = 0, g = 7, b = 0, a = 0.01 },
     warning = { r = 7, g = 7, b = 0, a = 0.01 },
@@ -77,32 +45,36 @@ WarehouseItems = {
     TurboMotor = { item = findItem('Turbo Motor'), icon = 273 }
 }
 
+function DownloadScript(sourcePath)
+    local url = 'https://raw.githubusercontent.com/' .. Repo .. '/' .. Branch .. '/' .. sourcePath
+    local req = INET:request(url, 'GET', '')
+    local _, data = req:await()
 
-function GetSigns(class)
-    signs = {}
-    for _, comp in ipairs(component.findComponent(findClass(class))) do
-        table.insert(signs, component.proxy(comp))
-    end
-    return signs
+    return data
 end
 
-function SetSignIcon(sign, index)
-    signData = sign:getPrefabSignData()
-    signData:setIconElement('icon', index)
-    sign:setPrefabSignData(signData)
-    event.pull(0.01)
+function SaveScript(script, path)
+    local path = '/' .. path
+
+    filesystem.initFileSystem('/dev')
+    filesystem.makeFileSystem('tmpfs', 'scripts')
+    filesystem.mount('/dev/scripts', '/')
+
+    local file = filesystem.open(path, 'w')
+
+    file:write(script)
+    file:close()
 end
 
-function SetSignColor(sign, color)
-    signData = sign:getPrefabSignData()
-    signColor = signData.background
-    signColor.r = color.r
-    signColor.g = color.g
-    signColor.b = color.b
-    signColor.a = color.a
-    signData.background = signColor
-    sign:setPrefabSignData(signData)
-    event.pull(0.01)
+function LoadLib(lib)
+    print('Loading lib ' .. lib .. ' from ' .. Repo .. '/' .. Branch .. '...')
+    SaveScript(DownloadScript(lib), lib)
+    filesystem.doFile(lib)
+end
+
+function LoadLIbs()
+    LoadLib('Libs/Network.lua')
+    LoadLib('Libs/Signs.lua')
 end
 
 function BroadcastItemLevel(item, level)
@@ -148,8 +120,8 @@ function UpdateItemLevel(warehouseItem, container)
     local level = GetItemLevel(warehouseItem, container)
     local color = GetColor(level)
 
-    for _, display in ipairs(GetSigns('Build_StandaloneWidgetSign_Square_Small_C')) do
-        SetSignColor(display, color)
+    for _, display in ipairs(Signs.getSigns('Build_StandaloneWidgetSign_Square_Small_C')) do
+        Signs.setSignColor(display, color)
     end
 
     BroadcastItemLevel(warehouseItem.item.name, level)
@@ -157,8 +129,8 @@ end
 
 function AssignItem(warehouseItem, container)
     if warehouseItem then
-        for _, sign in ipairs(GetSigns('Build_StandaloneWidgetSign_Square_C')) do
-            SetSignIcon(sign, warehouseItem['icon'])
+        for _, sign in ipairs(Signs.getSigns('Build_StandaloneWidgetSign_Square_C')) do
+            Signs.setSignIcon(sign, warehouseItem['icon'])
         end
     else
         print('Unknown item ' .. container.nick)
@@ -194,9 +166,7 @@ end
 
 
 
-NET = component.proxy(component.findComponent(findClass("NetworkCard")[1]))
-Network = Networks.FindNetwork(computer.nick)
-
+LoadLIbs()
 while true do
     local container = GetContainer()
     local warehouseItem = #container and GetItem(container) or WarehouseItems.None

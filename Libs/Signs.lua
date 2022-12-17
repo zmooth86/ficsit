@@ -1,8 +1,10 @@
-function GetSign(name)
+Signs = {}
+
+function Signs.getSign(name)
     return component.proxy(component.findComponent(name)[1])
 end
 
-function GetSigns(group)
+function Signs.getSigns(group)
     signs = {}
     for _, comp in ipairs(component.findComponent(group)) do
         table.insert(signs, component.proxy(comp))
@@ -10,21 +12,21 @@ function GetSigns(group)
     return signs
 end
 
-function SetSignText(sign, text)
+function Signs.setSignText(sign, text)
     signData = sign:getPrefabSignData()
     signData:setTextElement('name', text)
     sign:setPrefabSignData(signData)
     event.pull(0.01)
 end
 
-function SetSignIcon(sign, index)
+function Signs.setSignIcon(sign, index)
     signData = sign:getPrefabSignData()
     signData:setIconElement('icon', index)
     sign:setPrefabSignData(signData)
     event.pull(0.0)
 end
 
-function SetSignColor(sign, color)
+function Signs.setSignColor(sign, color)
     signData = sign:getPrefabSignData()
     signColor = signData.background
     signColor.r = color.r
@@ -36,7 +38,7 @@ function SetSignColor(sign, color)
     event.pull(0.0)
 end
 
-function GetSignText(sign)
+function Signs.getSignText(sign)
     signData = sign:getPrefabSignData()
     textElements = signData:getTextElements()
     text = signData:getTextElement(textElements[1])
@@ -44,13 +46,13 @@ function GetSignText(sign)
     return text, label
 end
 
-function GetSignIcon(sign)
+function Signs.getSignIcon(sign)
     signData = sign:getPrefabSignData()
     iconElements = signData:getIconElements()
     return signData:getIconElement(iconElements[1])
 end
 
-function GetSignBackground(sign)
+function Signs.getSignBackground(sign)
     signData = sign:getPrefabSignData()
     iconElements = signData:getIconElements()
     return signData:getIconElement(iconElements[2])
