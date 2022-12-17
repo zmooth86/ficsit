@@ -65,7 +65,11 @@ function Network:receiveMessage(messageId)
     return false
 end
 
-function Network:sendMessage(d1, d2, d3, d4, d5, d6, d7)
+function Network:status(computer, message)
+    self.device.broadcast(Networks.HUB.ControlCenter.port, computer.id, message)
+end
+
+function Network:send(d1, d2, d3, d4, d5, d6, d7)
     self.device.broadcast(self.port, d1, d2, d3, d4, d5, d6, d7)
 end
 

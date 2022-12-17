@@ -77,10 +77,6 @@ function LoadLIbs()
     LoadLib('Libs/Signs.lua')
 end
 
-function BroadcastItemLevel(item, level)
-    NET.broadcast(Network.port, item, level)
-end
-
 function GetColor(level)
     if level < 0.1 then
         return Colors.error
@@ -124,7 +120,7 @@ function UpdateItemLevel(warehouseItem, container)
         Signs.setSignColor(display, color)
     end
 
-    BroadcastItemLevel(warehouseItem.item.name, level)
+    Network:send(warehouseItem.item.name, level)
 end
 
 function AssignItem(warehouseItem, container)

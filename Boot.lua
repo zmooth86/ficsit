@@ -41,11 +41,19 @@ function UpdateBoot()
     computer.setEEPROM(DownloadScript('Boot.lua'))
 end
 
-function Update()
+function Control()
+    local status = 'System up and running.'
+    Network:status(computer, status)
+    print(status)
+
     while true do
         local update, repo, branch, script = Network:receiveMessage(Commands.Update)
 
         if update then
+            local status = 'Going to restart for update.'
+            Network:status(computer, status)
+            print(status)
+
             Repo = repo
             Branch = branch
 
@@ -61,7 +69,7 @@ function Update()
 end
 
 function Main()
-    print('Running main script ...')
+    print('Starting main script ...')
     filesystem.doFile('Main.lua')
 end
 
@@ -81,7 +89,7 @@ end
 
 LoadLIbs()
 
-Scheduler.create(Update)
+Scheduler.create(Control)
 Scheduler.create(Main)
 
 Scheduler.run()
