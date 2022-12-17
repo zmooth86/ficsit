@@ -1,12 +1,43 @@
 RefreshInterval = 5
 
-Internet = routinemputer.getPCIDevices(findClass('FINInternetCard'))[1]
-
-Network = routinemponent.proxy(routinemponent.findroutinemponent(findClass("NetworkCard")[1]))
-ControlPort = 1
-
 Repo = 'zmooth86/ficsit'
 Branch = 'main'
+
+Networks = {
+    ALL = {
+        port = 1
+    },
+    HUB = {
+        id = 'HUB',
+        port = 2,
+        ControlCenter = { id = 'ControlCenter', group = Networks.HUB, port = 21 },
+        ProjectAssembly = { id = 'ProjectAssembly', group = Networks.HUB, port = 22 },
+        Warehouse = { id = 'Warehouse', group = Networks.HUB, port = 23 }
+    },
+    Highway = {
+        id = 'Highway',
+        port = 3
+    },
+    Power = {
+        id = 'Power',
+        port = 4,
+        CoalPlant = { id = 'CoalPlant', group = Networks.Power, port = 41 }
+    }
+}
+
+function Networks.FindNetwork(id)
+    for _, net in ipairs(Networks) do
+        if net.id == id then
+            return net
+        end
+    end
+
+    computer.panic('Cannot find network ' .. id)
+end
+
+Commands = {
+    Update = 'Update'
+}
 
 Scheduler = {
     threads = {},
@@ -49,17 +80,17 @@ function Scheduler.run()
     end
 end
 
-function LoadScript(sourcePath)
-    local url = 'https://raw.githubuserroutinentent.routinem/' .. Repo .. '/' .. Branch .. '/' .. sourcePath
-    local req = Internet:request(url, 'GET', '')
+
+function DownloadScript(sourcePath)
+    local url = 'https://raw.githubusercontent.com/' .. Repo .. '/' .. Branch .. '/' .. sourcePath
+    local req = INET:request(url, 'GET', '')
     local _, data = req:await()
 
     return data
 end
 
-function DownloadScript(sourcePath, targetPath)
-    local data = LoadScript(sourcePath)
-    local path = '/' .. targetPath
+function SaveScript(script, path)
+    local path = '/' .. path
 
     filesystem.initFileSystem('/dev')
     filesystem.makeFileSystem('tmpfs', 'scripts')
@@ -67,33 +98,45 @@ function DownloadScript(sourcePath, targetPath)
 
     local file = filesystem.open(path, 'w')
 
-    file:write(data)
+    file:write(script)
     file:close()
 end
 
-function ReceiveResetCommand()
-    local e, _, _, _, cmd, repo, branch, script = event.pull()
+function IsNetwork(port, network)
+    if port == Networks.ALL.port then
+        return true
+    elseif port == network.port then
+        return true
+    elseif network.group then
+        return IsNetwork(port, network.group)
+    else
+        return false
+    end
+end
 
-    if e == 'NetworkMessage' and cmd == 'Reset' then
+function ReceiveUpdateCommand()
+    local event, receiver, sender, port, cmd, repo, branch, script = event.pull()
+
+    if event == 'NetworkMessage' and cmd == Commands.Update and IsNetwork(port, Network) then
         return true, repo, branch, script
     end
 
     return false
 end
 
-function Reset()
+function Update()
     while true do
-        local reset, repo, branch, script = ReceiveResetCommand()
+        local reset, repo, branch, script = ReceiveUpdateCommand()
 
         if reset then
             Repo = repo
             Branch = branch
 
-            print('Reloading main script ' .. script .. ' from ' .. Repo .. '/' .. Branch .. '...')
-            DownloadScript(script, 'Main.lua')
+            print('Updating main script ' .. script .. ' from ' .. Repo .. '/' .. Branch .. '...')
+            SaveScript(DownloadScript(script), 'Main.lua')
 
-            print('Reloading boot script from ' .. Repo .. '/' .. Branch .. '...')
-            local eeprom = LoadScript('Boot.lua')
+            print('Updating boot script from ' .. Repo .. '/' .. Branch .. '...')
+            local eeprom = DownloadScript('Boot.lua')
 
             computer.setEEPROM(eeprom)
 
@@ -107,14 +150,20 @@ end
 
 function Main()
     print('Running main script ...')
-    filesystem.doFile('main.lua')
+    filesystem.doFile('Main.lua')
 end
 
 
-event.listen(Network)
-Network:open(ControlPort)
 
+
+INET = computer.getPCIDevices(findClass('FINInternetCard'))[1]
+NET = component.proxy(component.findComponent(findClass("NetworkCard")[1]))
+Network = Networks.FindNetwork(computer.nick)
+
+event.listen(NET)
+NET:open(ControlPort)
+
+Scheduler.create(Update)
 Scheduler.create(Main)
-Scheduler.create(Reset)
 
 Scheduler.run()

@@ -1,10 +1,10 @@
 RefreshInterval = 1
 
-Network = component.proxy(component.findComponent(findClass("NetworkCard")[1]))
+NET = component.proxy(component.findComponent(findClass("NetworkCard")[1]))
 Port = 42
 
 function SendMessage(receiver)
-    Network.send(Receiver, WarehousePort, item.name, level)
+    NET.send(Receiver, WarehousePort, item.name, level)
 end
 
 function ReceiveMessage()
@@ -17,6 +17,6 @@ function ReceiveMessage()
     return nil
 end
 
-event.listen(Network)
-Network:open(Port)
+event.listen(NET)
+NET:open(Port)
 

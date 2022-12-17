@@ -1,7 +1,36 @@
 RefreshInterval = 1
 
-Network = component.proxy(component.findComponent(findClass("NetworkCard")[1]))
-WarehousePort = 42
+Networks = {
+    ALL = {
+        port = 1
+    },
+    HUB = {
+        id = 'HUB',
+        port = 2,
+        ControlCenter = { id = 'ControlCenter', group = Networks.HUB, port = 21 },
+        ProjectAssembly = { id = 'ProjectAssembly', group = Networks.HUB, port = 22 },
+        Warehouse = { id = 'Warehouse', group = Networks.HUB, port = 23 }
+    },
+    Highway = {
+        id = 'Highway',
+        port = 3
+    },
+    Power = {
+        id = 'Power',
+        port = 4,
+        CoalPlant = { id = 'CoalPlant', group = Networks.Power, port = 41 }
+    }
+}
+
+function Networks.FindNetwork(id)
+    for _, net in ipairs(Networks) do
+        if net.id == id then
+            return net
+        end
+    end
+
+    computer.panic('Cannot find network ' .. id)
+end
 
 Colors = {
     ok = { r = 0, g = 7, b = 0, a = 0.01 },
@@ -48,6 +77,7 @@ WarehouseItems = {
     TurboMotor = { item = findItem('Turbo Motor'), icon = 273 }
 }
 
+
 function GetSigns(class)
     signs = {}
     for _, comp in ipairs(component.findComponent(findClass(class))) do
@@ -76,7 +106,7 @@ function SetSignColor(sign, color)
 end
 
 function BroadcastItemLevel(item, level)
-    Network.broadcast(WarehousePort, item, level)
+    NET.broadcast(Network.port, item, level)
 end
 
 function GetColor(level)
@@ -160,6 +190,12 @@ function GetContainer()
 
     return container
 end
+
+
+
+
+NET = component.proxy(component.findComponent(findClass("NetworkCard")[1]))
+Network = Networks.FindNetwork(computer.nick)
 
 while true do
     local container = GetContainer()
