@@ -120,15 +120,15 @@ function Network:receiveCommand(command)
 end
 
 function Network:command(network, command, d1, d2, d3, d4, d5, d6)
-    self.device.broadcast(network.port, command, d1, d2, d3, d4, d5, d6)
+    self.device:broadcast(network.port, command, d1, d2, d3, d4, d5, d6)
 end
 
-function Network:status(computer, message)
-    self.device.broadcast(Networks.HUB.subnets.ControlCenter.port, computer.id, message)
+function Network:status(message)
+    self.device:broadcast(Networks.HUB.subnets.ControlCenter.port, computer.id, message)
 end
 
 function Network:send(d1, d2, d3, d4, d5, d6, d7)
-    self.device.broadcast(self.port, d1, d2, d3, d4, d5, d6, d7)
+    self.device:broadcast(self.port, d1, d2, d3, d4, d5, d6, d7)
 end
 
 Network:init()
