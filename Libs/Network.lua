@@ -5,9 +5,9 @@ Networks = {
     HUB = {
         id = 'HUB',
         port = 2,
-        ControlCenter = { id = 'ControlCenter', group = Network.HUB, port = 21 },
-        ProjectAssembly = { id = 'ProjectAssembly', group = Network.HUB, port = 22 },
-        Warehouse = { id = 'Warehouse', group = Network.HUB, port = 23 }
+        ControlCenter = { id = 'ControlCenter', group = Networks.HUB, port = 21 },
+        ProjectAssembly = { id = 'ProjectAssembly', group = Networks.HUB, port = 22 },
+        Warehouse = { id = 'Warehouse', group = Networks.HUB, port = 23 }
     },
     Highway = {
         id = 'Highway',
@@ -16,7 +16,7 @@ Networks = {
     Power = {
         id = 'Power',
         port = 4,
-        CoalPlant = { id = 'CoalPlant', group = Network.Power, port = 41 }
+        CoalPlant = { id = 'CoalPlant', group = Networks.Power, port = 41 }
     }
 }
 
