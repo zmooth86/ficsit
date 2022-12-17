@@ -20,6 +20,10 @@ function SaveScript(script, path)
     filesystem.makeFileSystem('tmpfs', 'scripts')
     filesystem.mount('/dev/scripts', '/')
 
+    if filesystem.exists(path) then
+        filesystem.remove(path)
+    end
+
     local file = filesystem.open(path, 'w')
 
     file:write(script)
