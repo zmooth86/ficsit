@@ -21,7 +21,7 @@ Networks = {
 }
 
 function Networks.findNetwork(id)
-    for _, net in ipairs(Network) do
+    for _, net in ipairs(Networks) do
         if net.id == id then
             return net
         end
@@ -35,8 +35,8 @@ function Network:isNetwork(port)
         return true
     elseif port == self.current.port then
         return true
-    elseif self.current.group then
-        return IsNetwork(port, self.group)
+    elseif self.group then
+        return self.group:isNetwork(port)
     else
         return false
     end
@@ -45,7 +45,7 @@ end
 function Network:receive()
     local event, receiver, sender, port, d1, d2, d3, d4, d5, d6, d7 = event.pull()
 
-    if event == 'NetworkMessage' and IsNetwork(port, self) then
+    if event == 'NetworkMessage' and self:isNetwork(port) then
         return d1, d2, d3, d4, d5, d6, d7
     end
 
@@ -55,7 +55,7 @@ end
 function Network:receiveMessage(messageId)
     local event, receiver, sender, port, id, d2, d3, d4, d5, d6, d7 = event.pull()
 
-    if event == 'NetworkMessage' and Network:isNetwork(port) and id == messageId then
+    if event == 'NetworkMessage' and self:isNetwork(port) and id == messageId then
         return true, d2, d3, d4, d5, d6, d7
     end
 
@@ -63,22 +63,22 @@ function Network:receiveMessage(messageId)
 end
 
 function Network:sendMessage(d1, d2, d3, d4, d5, d6, d7)
-    NET.broadcast(self.port, d1, d2, d3, d4, d5, d6, d7)
+    self.device.broadcast(self.port, d1, d2, d3, d4, d5, d6, d7)
 end
 
 function Network:openPorts()
-    Network.Device:open(self.port)
+    self.device:open(self.port)
 
     if self.group then
-        Network.openPorts(self.group)
+        self.group:openPorts()
     end
 end
 
-Network.Device = component.proxy(component.findComponent(findClass("NetworkCard")[1]))
-if not Network.Device then
+Network = Networks.findNetwork(computer.nick)
+Network.device = component.proxy(component.findComponent(findClass("NetworkCard")[1]))
+if not Network.device then
     computer.panic('No network card found!')
 end
-Network = Networks.FindNetwork(computer.nick)
 
 event.listen(Network.device)
 Network:openPorts()
