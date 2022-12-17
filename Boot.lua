@@ -3,10 +3,6 @@ RefreshInterval = 5
 Repo = 'zmooth86/ficsit'
 Branch = 'main'
 
-Commands = {
-    Update = 'Update'
-}
-
 INET = computer.getPCIDevices(findClass('FINInternetCard'))[1]
 
 
@@ -47,7 +43,7 @@ function Control()
     print(status)
 
     while true do
-        local update, repo, branch, script = Network:receiveMessage(Commands.Update)
+        local update, repo, branch, script = Network:receiveCommand(Network.Commands.Update)
 
         if update then
             local status = 'Going to restart for update.'

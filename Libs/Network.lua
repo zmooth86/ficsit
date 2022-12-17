@@ -20,6 +20,11 @@ Networks = {
     }
 }
 
+Network.Commands = {
+    Update = 'Update'
+}
+
+
 function Network:init()
     for _, net in ipairs(Networks) do
         if net.id == self.device.nick then
@@ -55,14 +60,18 @@ function Network:receive()
     return nil
 end
 
-function Network:receiveMessage(messageId)
-    local event, receiver, sender, port, id, d2, d3, d4, d5, d6, d7 = event.pull()
+function Network:receiveCommand(command)
+    local event, receiver, sender, port, cmd, d2, d3, d4, d5, d6, d7 = event.pull()
 
-    if event == 'NetworkMessage' and self:isNetwork(port) and id == messageId then
+    if event == 'NetworkMessage' and self:isNetwork(port) and cmd == command then
         return true, d2, d3, d4, d5, d6, d7
     end
 
     return false
+end
+
+function Network:command(network, command, d1, d2, d3, d4, d5, d6)
+    self.device.broadcast(network.port, command, d1, d2, d3, d4, d5, d6)
 end
 
 function Network:status(computer, message)
