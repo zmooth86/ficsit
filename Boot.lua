@@ -52,11 +52,6 @@ function Control()
     end
 end
 
-function Main()
-    print('Starting main script ...')
-    filesystem.doFile('Main.lua')
-end
-
 function LoadMain()
     print('Loading main script ' .. Script .. ' from ' .. Repo .. '/' .. Branch .. '...')
     SaveScript(DownloadScript(Script), 'Main.lua')
@@ -82,7 +77,7 @@ LoadLIbs()
 LoadMain()
 
 Scheduler:create(Control)
-Scheduler:create(Main)
+Scheduler:create(filesystem.loadFile('Main.lua'))
 
 local status = 'System up and running.'
 Network:status(status)

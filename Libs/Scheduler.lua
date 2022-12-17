@@ -1,5 +1,3 @@
-RefreshInterval = 1
-
 Scheduler = {
     threads = {},
     current = 1,
@@ -11,7 +9,6 @@ function Scheduler:create(func)
         function()
             while true do
                 func()
-                event.pull(RefreshInterval)
                 coroutine.yield()
             end
         end
