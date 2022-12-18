@@ -123,9 +123,10 @@ function Network:command(network, command, d1, d2, d3, d4, d5, d6)
     self.device:broadcast(network.port, command, d1, d2, d3, d4, d5, d6)
 end
 
-function Network:status(computer, message)
-    print(message)
-    self.device:broadcast(Networks.HUB.subnets.ControlCenter.port, computer.id, message)
+function Network:status(computerId, message)
+    local _,_,time = computer.magiTime()
+    print(time, message)
+    self.device:broadcast(Networks.HUB.subnets.ControlCenter.port, time, message)
 end
 
 function Network:send(d1, d2, d3, d4, d5, d6, d7)
