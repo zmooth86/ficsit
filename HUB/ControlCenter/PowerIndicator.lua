@@ -47,5 +47,7 @@ end
 
 
 
-
-IndicateWorkload(component.proxy(component.findComponent(findClass('FGBuildablePowerPole'))[1]))
+while true do
+    IndicateWorkload(component.proxy(component.findComponent(findClass('FGBuildablePowerPole'))[1]))
+    event.pull(1)
+end
