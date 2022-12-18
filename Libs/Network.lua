@@ -62,10 +62,6 @@ end
 
 function Network:receive()
     local e, receiver, sender, port, d1, d2, d3, d4, d5, d6, d7 = event.pull()
-    while e ~= 'NetworkMessage' and  Network.port ~= port do
-        e, receiver, sender, port, d1, d2, d3, d4, d5, d6, d7 = event.pull()
-    end
-
     return sender, d1, d2, d3, d4, d5, d6, d7
 end
 
@@ -75,11 +71,6 @@ end
 
 function Network:receiveControlSignal()
     local e, receiver, sender, port, signal, d2, d3, d4, d5, d6, d7 = event.pull()
-
-    while e ~= 'NetworkMessage' and  Networks.Control.port ~= port do
-        e, receiver, sender, port, signal, d2, d3, d4, d5, d6, d7 = event.pull()
-    end
-
     return sender, signal, d2, d3, d4, d5, d6, d7
 end
 
@@ -91,10 +82,6 @@ end
 
 function Network.receiveLog()
     local e, receiver, sender, port, time, message = event.pull()
-    while e ~= 'NetworkMessage' and  Networks.Logging.port ~= port do
-        e, receiver, sender, port, time, message = event.pull()
-    end
-
     return sender, time, message
 end
 
