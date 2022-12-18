@@ -63,7 +63,7 @@ function LoadLib(lib)
     filesystem.doFile(lib)
 end
 
-function LoadLIbs()
+function LoadLibs()
     LoadLib('Scheduler.lua')
     LoadLib('Network.lua')
     LoadLib('Signs.lua')
@@ -72,7 +72,7 @@ end
 
 
 
-LoadLIbs()
+LoadLibs()
 
 if filesystem.exists('Main.lua') then
     local main = filesystem.loadFile(lib)
