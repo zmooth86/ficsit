@@ -101,9 +101,9 @@ function Network:isNetwork(port)
 end
 
 function Network:receive()
-    local event, receiver, sender, port, d1, d2, d3, d4, d5, d6, d7 = event.pull()
+    local e, receiver, sender, port, d1, d2, d3, d4, d5, d6, d7 = event.pull()
 
-    if event == 'NetworkMessage' and self:isNetwork(port) then
+    if e == 'NetworkMessage' and self:isNetwork(port) then
         return d1, d2, d3, d4, d5, d6, d7
     end
 
@@ -111,10 +111,10 @@ function Network:receive()
 end
 
 function Network:receiveControlSignal()
-    local event, receiver, sender, port, signal, d2, d3, d4, d5, d6, d7 = event.pull()
+    local e, receiver, sender, port, signal, d2, d3, d4, d5, d6, d7 = event.pull()
 
-    while event ~= 'NetworkMessage' and not self:isNetwork(port) do
-        event, receiver, sender, port, signal, d2, d3, d4, d5, d6, d7 = event.pull()
+    while e ~= 'NetworkMessage' and not self:isNetwork(port) do
+        e, receiver, sender, port, signal, d2, d3, d4, d5, d6, d7 = event.pull()
     end
 
     return signal, d2, d3, d4, d5, d6, d7
