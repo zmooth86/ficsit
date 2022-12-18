@@ -34,12 +34,12 @@ function SaveScript(script, path)
 end
 
 function UpdateBoot()
-    Network:status('Updating boot script from ' .. Repo .. '/' .. Branch .. '...')
+    Network:log('Updating boot script from ' .. Repo .. '/' .. Branch .. '...')
     computer.setEEPROM(DownloadScript('Boot.lua'))
 end
 
 function UpdateMain(script)
-    Network:status('Updating main script ' .. script .. ' from ' .. Repo .. '/' .. Branch .. '...')
+    Network:log('Updating main script ' .. script .. ' from ' .. Repo .. '/' .. Branch .. '...')
     SaveScript(DownloadScript(script), 'Main.lua')
 end
 
@@ -49,12 +49,12 @@ function Control()
     if signal == Network.signals.continue then
         return
     elseif signal == Network.signals.restart then
-        Network:status('Going to restart for update.')
+        Network:log('Going to restart for update.')
 
         UpdateBoot()
         UpdateMain(script)
 
-        Network:status('Resetting the system...')
+        Network:log('Resetting the system now...')
         computer.reset()
     end
 end
@@ -87,15 +87,15 @@ InitDisk()
 LoadLib('Libs/Scheduler.lua')
 LoadLib('Libs/Network.lua')
 LoadLib('Libs/Signs.lua')
-Network:status('Loaded all libs.')
+Network:log('Loaded all libs.')
 
 Scheduler:create(Control)
 if filesystem.exists('Main.lua') then
     Scheduler:create(Main)
-    Network:status('Main script loaded')
+    Network:log('Main script loaded')
 else
-    Network:status('No main script found.')
+    Network:log('No main script found.')
 end
 
-Network:status('System up and running.')
+Network:log('System up and running.')
 Scheduler:run()

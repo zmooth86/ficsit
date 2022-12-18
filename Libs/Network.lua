@@ -1,39 +1,17 @@
 Networks = {
-    ALL = {
-        port = 1
-    },
-    HUB = {
-        id = 'HUB',
-        port = 2,
-        subnets = {
-            ControlCenter = { id = 'ControlCenter', group = 'HUB', port = 21 },
-            ProjectAssembly = { id = 'ProjectAssembly', group = 'HUB', port = 22 },
-            Warehouse = { id = 'Warehouse', group = 'HUB', port = 23 }
-        }
-    },
-    Highway = {
-        id = 'Highway',
-        port = 3
-    },
-    Power = {
-        id = 'Power',
-        port = 4,
-        subnets = {
-            CoalPlant = { id = 'CoalPlant', group = 'Power', port = 41 }
-        }
-    }
+    Control = { id = 'Control', port = 1, signals = { continue = 0, restart = 1 } },
+    Logging = { id = 'Logging', port = 2 },
+    ProjectAssembly = { id = 'ProjectAssembly', port = 3 },
+    Warehouse = { id = 'Warehouse', port = 4 },
+    Garage = { id = 'Garage', port = 5 },
+    CoalPowerPlant = { id = 'CoalPowerPlant', port = 6 }
 }
 
 Network = {
     device = component.proxy(component.findComponent(findClass("NetworkCard"))[1]),
     id = nil,
     port = nil,
-    subnets = {},
-    group = nil,
-    signals = {
-        continue = 0,
-        restart = 1
-    }
+    signals = {}
 }
 
 function Network:init()
@@ -43,7 +21,7 @@ function Network:init()
 
     self:setNetwork()
     event.listen(self.device)
-    self:openPorts()
+    self:openControlPort()
 end
 
 function Network:setNetwork()
@@ -54,84 +32,66 @@ function Network:setNetwork()
 
     self.id = network.id
     self.port = network.port
-    self.subnets = network.subnets
-    self.group = network.group
+    self.signals = network.signals
 end
 
 function Network:findNetwork(nets)
     for _, net in pairs(nets) do
         local network = nil
         if net.id == self.device.nick then
-            network = net
-        elseif net.subnets then
-            network = self:findNetwork(net.subnets)
-        end
-        if network then
-            return network
+            return net
         end
     end
 end
 
-function Network:openPorts()
-    self.device:open(self.port)
-
-    if self.group then
-        self:openPort(Networks[self.group])
-    end
+function Network:openControlPort()
+    self.device:open(Networks.Control.port)
 end
 
 function Network:openPort(network)
     self.device:open(network.port)
-
-    if network.group then
-        self:openPort(Networks[network.group])
-    end
 end
 
-function Network:isNetwork(port)
-    if port == Networks.ALL.port then
-        return true
-    elseif port == self.port then
-        return true
-    elseif self.group then
-        return Networks[self.group]:isNetwork(port)
-    else
-        return false
-    end
+function Network:send(d1, d2, d3, d4, d5, d6, d7)
+    self.device:broadcast(self.port, d1, d2, d3, d4, d5, d6, d7)
 end
 
 function Network:receive()
     local e, receiver, sender, port, d1, d2, d3, d4, d5, d6, d7 = event.pull()
-
-    if e == 'NetworkMessage' and self:isNetwork(port) then
-        return d1, d2, d3, d4, d5, d6, d7
+    while e ~= 'NetworkMessage' and  Network.port ~= port do
+        e, receiver, sender, port, d1, d2, d3, d4, d5, d6, d7 = event.pull()
     end
 
-    return nil
+    return sender, d1, d2, d3, d4, d5, d6, d7
+end
+
+function Network:controlSignal(signal, d1, d2, d3, d4, d5, d6)
+    self.device:broadcast(Networks.Control.port, signal, d1, d2, d3, d4, d5, d6)
 end
 
 function Network:receiveControlSignal()
     local e, receiver, sender, port, signal, d2, d3, d4, d5, d6, d7 = event.pull()
 
-    while e ~= 'NetworkMessage' and not self:isNetwork(port) do
+    while e ~= 'NetworkMessage' and  Networks.Control.port ~= port do
         e, receiver, sender, port, signal, d2, d3, d4, d5, d6, d7 = event.pull()
     end
 
-    return signal, d2, d3, d4, d5, d6, d7
+    return sender, signal, d2, d3, d4, d5, d6, d7
 end
 
-function Network:sendControlSignal(network, signal, d1, d2, d3, d4, d5, d6)
-    self.device:broadcast(network.port, signal, d1, d2, d3, d4, d5, d6)
-end
-
-function Network:status(message)
+function Network:log(message)
     local _,_,time = computer.magicTime()
-    print(time, message)
-    self.device:broadcast(Networks.HUB.subnets.ControlCenter.port, time, message)
+    print('[' .. time .. ']', message)
+    self.device:broadcast(Networks.Logging.port, time, message)
 end
 
-function Network:send(d1, d2, d3, d4, d5, d6, d7)
-    self.device:broadcast(self.port, d1, d2, d3, d4, d5, d6, d7)
+function Network.receiveLog()
+    local e, receiver, sender, port, time, message = event.pull()
+    while e ~= 'NetworkMessage' and  Networks.Logging.port ~= port do
+        e, receiver, sender, port, time, message = event.pull()
+    end
+
+    return sender, time, message
 end
 
 Network:init()
