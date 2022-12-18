@@ -71,6 +71,7 @@ InitDisk()
 LoadLib('Libs/Scheduler.lua')
 LoadLib('Libs/Network.lua')
 
+Network:closePorts()
 Network:openPort(Networks.Logging)
 
 Scheduler:create(SendContinue)

@@ -56,6 +56,14 @@ function Network:openPort(network)
     self.device:open(network.port)
 end
 
+function Network:closePort(port)
+    self.device:close(port)
+end
+
+function Network:closePorts()
+    self.device:closeAll()
+end
+
 function Network:send(d1, d2, d3, d4, d5, d6, d7)
     self.device:broadcast(self.port, d1, d2, d3, d4, d5, d6, d7)
 end
