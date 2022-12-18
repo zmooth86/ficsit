@@ -2,8 +2,16 @@ RefreshInterval = 1
 
 Scheduler = {
     threads = {},
-    current = 1,
+    current = 1
 }
+
+function Sleep(seconds)
+    local current = computer.millis()
+    local finish = current + seconds * 1000
+    while current < finish do
+        current = computer.millis()
+    end
+ end
 
 function Scheduler:create(func)
     local t = {}
@@ -11,7 +19,7 @@ function Scheduler:create(func)
         function()
             while true do
                 func()
-                event.pull(RefreshInterval)
+                Sleep(1)
                 coroutine.yield()
             end
         end
