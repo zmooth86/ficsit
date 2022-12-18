@@ -4,6 +4,10 @@ Branch = 'main'
 INET = computer.getPCIDevices(findClass('FINInternetCard'))[1]
 
 
+function Main()
+    filesystem.doFile('Main.lua')
+end
+
 function DownloadScript(sourcePath)
     local url = 'https://raw.githubusercontent.com/' .. Repo .. '/' .. Branch .. '/' .. sourcePath
     local req = INET:request(url, 'GET', '')
@@ -83,14 +87,13 @@ LoadLib('Libs/Network.lua')
 LoadLib('Libs/Signs.lua')
 Network:status('Loaded all libs.')
 
+Scheduler:create(Control)
 if filesystem.exists('Main.lua') then
-    local main = filesystem.loadFile('Main.lua')
-    Scheduler:create(main)
+    Scheduler:create(Main)
     Network:status('Main script loaded')
 else
     Network:status('No main script found.')
 end
-Scheduler:create(Control)
 
-Scheduler:run()
 Network:status('System up and running.')
+Scheduler:run()
