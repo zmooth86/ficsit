@@ -46,9 +46,9 @@ end
 function Control()
     local signal, script = Network:receiveControlSignal()
 
-    if signal == Network.signals.continue then
+    if signal == Signals.continue then
         return
-    elseif signal == Network.signals.restart then
+    elseif signal == Signals.restart then
         Network:log('Going to restart for update.')
 
         UpdateBoot()

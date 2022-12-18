@@ -56,11 +56,11 @@ function Logging()
 end
 
 function SendContinue()
-    Network:controlSignal(Network.signals.continue)
+    Network:controlSignal(Signals.Continue)
 end
 
 function SendRestart(script)
-    Network:controlSignal(Network.signals.restart, script)
+    Network:controlSignal(Signals.Restart, script)
 end
 
 

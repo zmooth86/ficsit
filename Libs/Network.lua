@@ -1,18 +1,22 @@
 Networks = {
-    Control = { id = 'Control', port = 1, signals = { continue = 0, restart = 1 } },
-    Logging = { id = 'Logging', port = 2 },
-    Power = { id = 'Power', port = 3 },
-    Highway = { id = 'Highway', port = 4 },
-    Warehouse = { id = 'Warehouse', port = 5 },
-    ProjectAssembly = { id = 'ProjectAssembly', port = 6 },
-    Factories = { id = 'Factories', port = 7}
+    Control = { id = 'Control', port = 0 },
+    Logging = { id = 'Logging', port = 1 },
+    Power = { id = 'Power', port = 2 },
+    Highway = { id = 'Highway', port = 3 },
+    Warehouse = { id = 'Warehouse', port = 4 },
+    ProjectAssembly = { id = 'ProjectAssembly', port = 5 },
+    Factories = { id = 'Factories', port = 6}
+}
+
+Signals = {
+    Continue = 0,
+    Restart = 1
 }
 
 Network = {
     device = component.proxy(component.findComponent(findClass("NetworkCard"))[1]),
     id = nil,
-    port = nil,
-    signals = {}
+    port = nil
 }
 
 function Network:init()
@@ -33,7 +37,6 @@ function Network:setNetwork()
 
     self.id = network.id
     self.port = network.port
-    self.signals = network.signals
 end
 
 function Network:findNetwork(nets)
