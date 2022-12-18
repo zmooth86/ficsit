@@ -99,8 +99,9 @@ function Network:isNetwork(port)
     end
 end
 
-function Network:receive()
-    local event, receiver, sender, port, d1, d2, d3, d4, d5, d6, d7 = event.pull()
+function Network:receive(timeout)
+    timeout = timeout or 0
+    local event, receiver, sender, port, d1, d2, d3, d4, d5, d6, d7 = event.pull(timeout)
 
     if event == 'NetworkMessage' and self:isNetwork(port) then
         return d1, d2, d3, d4, d5, d6, d7
@@ -109,8 +110,9 @@ function Network:receive()
     return nil
 end
 
-function Network:receiveCommand(command)
-    local event, receiver, sender, port, cmd, d2, d3, d4, d5, d6, d7 = event.pull()
+function Network:receiveCommand(command, timeout)
+    timeout = timeout or 0
+    local event, receiver, sender, port, cmd, d2, d3, d4, d5, d6, d7 = event.pull(timeout)
 
     if event == 'NetworkMessage' and self:isNetwork(port) and cmd == command then
         return true, d2, d3, d4, d5, d6, d7
