@@ -1,0 +1,1 @@
+print(computer.millis(), 'Hello')
