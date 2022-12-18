@@ -124,6 +124,7 @@ function Network:command(network, command, d1, d2, d3, d4, d5, d6)
 end
 
 function Network:status(message)
+    print(message)
     self.device:broadcast(Networks.HUB.subnets.ControlCenter.port, computer.id, message)
 end
 
