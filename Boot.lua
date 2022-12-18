@@ -38,7 +38,7 @@ function UpdateMain(script)
 end
 
 function Control()
-    local update, script = Network:receiveCommand(Network.Commands.Update)
+    local update, script = Network:receiveCommand(Network.commands.Update)
 
     if update then
         local status = 'Going to restart for update.'
