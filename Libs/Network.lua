@@ -1,10 +1,11 @@
 Networks = {
     Control = { id = 'Control', port = 1, signals = { continue = 0, restart = 1 } },
     Logging = { id = 'Logging', port = 2 },
-    ProjectAssembly = { id = 'ProjectAssembly', port = 3 },
-    Warehouse = { id = 'Warehouse', port = 4 },
-    Highway = { id = 'Highway', port = 5 },
-    Power = { id = 'Power', port = 6 }
+    Power = { id = 'Power', port = 3 },
+    Highway = { id = 'Highway', port = 4 },
+    Warehouse = { id = 'Warehouse', port = 5 },
+    ProjectAssembly = { id = 'ProjectAssembly', port = 6 },
+    Factories = { id = 'Factories', port = 7}
 }
 
 Network = {
