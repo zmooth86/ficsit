@@ -13,9 +13,13 @@ function DownloadScript(sourcePath)
 end
 
 function SaveScript(script, path)
-    filesystem.initFileSystem('/dev')
-    filesystem.makeFileSystem('tmpfs', 'scripts')
-    filesystem.mount('/dev/scripts', '/')
+    local path = '/' .. path
+
+    for dir in string.gmatch(path, "(%w+)/") do
+        if not filesystem.exists(dir) then
+            filesystem.createDir(dir)
+        end
+      end
 
     if filesystem.exists(path) then
         filesystem.remove(path)
@@ -53,21 +57,36 @@ end
 
 function LoadLib(lib)
     print('Loading lib ' .. lib .. ' from ' .. Repo .. '/' .. Branch .. '...')
-    SaveScript(DownloadScript('Libs/' .. lib), lib)
+    SaveScript(DownloadScript(lib), lib)
 
     filesystem.doFile(lib)
+end
+
+function InitDisk()
+    if filesystem.initFileSystem("/dev") == false then
+        computer.panic("Cannot initialize /dev")
+    end
+
+    local drives = filesystem.childs('/dev')
+    for idx, drive in pairs(drives) do
+        if drive == "serial" then table.remove(drives, idx) end
+    end
+
+    filesystem.mount('/dev/' .. drives[1], '/')
 end
 
 
 
 
-LoadLib('Scheduler.lua')
-LoadLib('Network.lua')
-LoadLib('Signs.lua')
+InitDisk()
+
+LoadLib('Libs/Scheduler.lua')
+LoadLib('Libs/Network.lua')
+LoadLib('Libs/Signs.lua')
 Network:status('Loaded all libs.')
 
 if filesystem.exists('Main.lua') then
-    local main = filesystem.loadFile(lib)
+    local main = filesystem.loadFile('Main.lua')
     Scheduler:create(main)
     Network:status('Main script loaded')
 else
