@@ -13,8 +13,6 @@ function DownloadScript(sourcePath)
 end
 
 function SaveScript(script, path)
-    local path = '/' .. path
-
     for dir in string.gmatch(path, "(%w+)/") do
         if not filesystem.exists(dir) then
             filesystem.createDir(dir)
