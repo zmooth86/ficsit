@@ -87,15 +87,15 @@ InitDisk()
 LoadLib('Libs/Scheduler.lua')
 LoadLib('Libs/Network.lua')
 LoadLib('Libs/Signs.lua')
-Network:log('Loaded all libs.')
+print('Loaded all libs.')
 
 Scheduler:create(Control)
 if filesystem.exists('Main.lua') then
     Scheduler:create(Main)
-    Network:log('Main script loaded')
+    Network:log('Main script loaded.')
 else
-    Network:log('No main script found.')
+    Network:log('No main script found!')
 end
 
-Network:log('System up and running.')
+Network:log('System up. Starting scheduler.')
 Scheduler:run()
