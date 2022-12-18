@@ -88,7 +88,7 @@ function Network:openPort(network)
 end
 
 function Network:isNetwork(port)
-    if port == Network.ALL.port then
+    if port == Networks.ALL.port then
         return true
     elseif port == self.port then
         return true
@@ -123,7 +123,7 @@ function Network:command(network, command, d1, d2, d3, d4, d5, d6)
     self.device:broadcast(network.port, command, d1, d2, d3, d4, d5, d6)
 end
 
-function Network:status(message)
+function Network:status(computer, message)
     print(message)
     self.device:broadcast(Networks.HUB.subnets.ControlCenter.port, computer.id, message)
 end

@@ -28,12 +28,12 @@ function SaveScript(script, path)
 end
 
 function UpdateBoot()
-    Network:status('Updating boot script from ' .. Repo .. '/' .. Branch .. '...')
+    Network:status(computer, 'Updating boot script from ' .. Repo .. '/' .. Branch .. '...')
     computer.setEEPROM(DownloadScript('Boot.lua'))
 end
 
 function UpdateMain(script)
-    Network:status('Updating main script ' .. script .. ' from ' .. Repo .. '/' .. Branch .. '...')
+    Network:status(computer, 'Updating main script ' .. script .. ' from ' .. Repo .. '/' .. Branch .. '...')
     SaveScript(DownloadScript(script), 'Main.lua')
 end
 
@@ -41,12 +41,12 @@ function Control()
     local update, script = Network:receiveCommand(Network.commands.Update)
 
     if update then
-        Network:status('Going to restart for update.')
+        Network:status(computer, 'Going to restart for update.')
 
         UpdateBoot()
         UpdateMain(script)
 
-        Network:status('Resetting the system...')
+        Network:status(computer, 'Resetting the system...')
         computer.reset()
     end
 end
@@ -64,16 +64,16 @@ end
 LoadLib('Scheduler.lua')
 LoadLib('Network.lua')
 LoadLib('Signs.lua')
-Network:status('Loaded all libs.')
+Network:status(computer, 'Loaded all libs.')
 
 if filesystem.exists('Main.lua') then
     local main = filesystem.loadFile(lib)
     Scheduler:create(main)
-    Network:status('Main script loaded')
+    Network:status(computer, 'Main script loaded')
 else
-    Network:status('No main script found.')
+    Network:status(computer, 'No main script found.')
 end
 Scheduler:create(Control)
 
 Scheduler:run()
-Network:status('System up and running.')
+Network:status(computer, 'System up and running.')
