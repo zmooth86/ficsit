@@ -1,6 +1,5 @@
 Repo = 'zmooth86/ficsit'
 Branch = 'main'
-Script = 'HUB/Warehouse/Dispenser.lua'
 
 INET = computer.getPCIDevices(findClass('FINInternetCard'))[1]
 
@@ -33,6 +32,11 @@ function UpdateBoot()
     computer.setEEPROM(DownloadScript('Boot.lua'))
 end
 
+function UpdateMain(script)
+    print('Updating main script ' .. script .. ' from ' .. Repo .. '/' .. Branch .. '...')
+    SaveScript(DownloadScript(script), 'Main.lua')
+end
+
 function Control()
     local update, repo, branch, script = Network:receiveCommand(Network.Commands.Update)
 
@@ -43,18 +47,13 @@ function Control()
 
         Repo = repo
         Branch = branch
-        Script = script
 
         UpdateBoot()
+        UpdateMain(script)
 
         print('Resetting the system...')
         computer.reset()
     end
-end
-
-function LoadMain()
-    print('Loading main script ' .. Script .. ' from ' .. Repo .. '/' .. Branch .. '...')
-    SaveScript(DownloadScript(Script), 'Main.lua')
 end
 
 function LoadLib(lib)
@@ -74,13 +73,11 @@ end
 
 
 LoadLIbs()
-LoadMain()
 
+if filesystem.exists('Main.lua') then
+    local main = filesystem.loadFile(lib)
+    Scheduler:create(main)
+end
 Scheduler:create(Control)
-Scheduler:create(filesystem.loadFile('Main.lua'))
-
-local status = 'System up and running.'
-Network:status(status)
-print(status)
 
 Scheduler:run()
