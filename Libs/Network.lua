@@ -30,8 +30,9 @@ Network = {
     port = nil,
     subnets = {},
     group = nil,
-    commands = {
-        Update = 'Update'
+    signals = {
+        continue = 0,
+        restart = 1
     }
 }
 
@@ -99,9 +100,8 @@ function Network:isNetwork(port)
     end
 end
 
-function Network:receive(timeout)
-    timeout = timeout or 0
-    local event, receiver, sender, port, d1, d2, d3, d4, d5, d6, d7 = event.pull(timeout)
+function Network:receive()
+    local event, receiver, sender, port, d1, d2, d3, d4, d5, d6, d7 = event.pull()
 
     if event == 'NetworkMessage' and self:isNetwork(port) then
         return d1, d2, d3, d4, d5, d6, d7
@@ -110,19 +110,18 @@ function Network:receive(timeout)
     return nil
 end
 
-function Network:receiveCommand(command, timeout)
-    timeout = timeout or 0
-    local event, receiver, sender, port, cmd, d2, d3, d4, d5, d6, d7 = event.pull(timeout)
+function Network:receiveControlSignal()
+    local event, receiver, sender, port, signal, d2, d3, d4, d5, d6, d7 = event.pull()
 
-    if event == 'NetworkMessage' and self:isNetwork(port) and cmd == command then
-        return true, d2, d3, d4, d5, d6, d7
+    while event ~= 'NetworkMessage' and not self:isNetwork(port) do
+        event, receiver, sender, port, signal, d2, d3, d4, d5, d6, d7 = event.pull()
     end
 
-    return false
+    return signal, d2, d3, d4, d5, d6, d7
 end
 
-function Network:command(network, command, d1, d2, d3, d4, d5, d6)
-    self.device:broadcast(network.port, command, d1, d2, d3, d4, d5, d6)
+function Network:sendControlSignal(network, signal, d1, d2, d3, d4, d5, d6)
+    self.device:broadcast(network.port, signal, d1, d2, d3, d4, d5, d6)
 end
 
 function Network:status(message)

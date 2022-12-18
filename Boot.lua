@@ -44,9 +44,11 @@ function UpdateMain(script)
 end
 
 function Control()
-    local update, script = Network:receiveCommand(Network.commands.Update)
+    local signal, script = Network:receiveControlSignal()
 
-    if update then
+    if signal == Network.signals.continue then
+        return
+    elseif signal == Network.signals.restart then
         Network:status('Going to restart for update.')
 
         UpdateBoot()
