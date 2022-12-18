@@ -3,8 +3,8 @@ Networks = {
     Logging = { id = 'Logging', port = 2 },
     ProjectAssembly = { id = 'ProjectAssembly', port = 3 },
     Warehouse = { id = 'Warehouse', port = 4 },
-    Garage = { id = 'Garage', port = 5 },
-    CoalPowerPlant = { id = 'CoalPowerPlant', port = 6 }
+    Highway = { id = 'Highway', port = 5 },
+    Power = { id = 'Power', port = 6 }
 }
 
 Network = {
