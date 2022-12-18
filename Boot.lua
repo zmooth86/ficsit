@@ -52,22 +52,19 @@ function Control()
 end
 
 function LoadLib(lib)
-    Network:status('Loading lib ' .. lib .. ' from ' .. Repo .. '/' .. Branch .. '...')
+    print('Loading lib ' .. lib .. ' from ' .. Repo .. '/' .. Branch .. '...')
     SaveScript(DownloadScript('Libs/' .. lib), lib)
 
     filesystem.doFile(lib)
 end
 
-function LoadLibs()
-    LoadLib('Scheduler.lua')
-    LoadLib('Network.lua')
-    LoadLib('Signs.lua')
-end
 
 
 
-
-LoadLibs()
+LoadLib('Scheduler.lua')
+LoadLib('Network.lua')
+LoadLib('Signs.lua')
+Network:status('Loaded all libs.')
 
 if filesystem.exists('Main.lua') then
     local main = filesystem.loadFile(lib)
